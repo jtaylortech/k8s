@@ -33,10 +33,14 @@ Chart reference + config knobs. [Artifact Hub](https://artifacthub.io/packages/h
 
 ``` asb
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update cat > values-nginx.yaml <<'EOF' service: type: ClusterIP
+helm repo update 
+cat > values-nginx.yaml <<'EOF' 
+service: 
+  type: ClusterIP
 ingress:
-  enabled: true hostname: hello.localtest.me     # wildcard DNS -> 
-  127.0.0.1 ingressClassName: nginx              # targets ingress-nginx 
+  enabled: true 
+  hostname: hello.localtest.me     # wildcard DNS -> 127.0.0.1 
+  ingressClassName: nginx              # targets ingress-nginx 
   path: /
 EOF
 
@@ -60,8 +64,13 @@ This proves Ingress host-based routing → Service → Pods. (Ingress concept). 
 **Why now:** Helm release mgmt is core in prod.
 
 ```bash
-# scale via values helm upgrade web bitnami/nginx -f values-nginx.yaml --set replicaCount=3
-kubectl get deploy web-nginx -w # simulate bad change, then rollback helm upgrade web bitnami/nginx --set replicaCount=bad || true helm history web
+# scale via values 
+helm upgrade web bitnami/nginx -f values-nginx.yaml --set replicaCount=3
+kubectl get deploy web-nginx -w 
+
+# simulate bad change, then rollback 
+helm upgrade web bitnami/nginx --set replicaCount=bad || true 
+helm history web
 helm rollback web 1
 ``` 
 HPA comes later; this shows Helm workflows first. HPA docs when ready. [Kubernetes](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/?utm_source=chatgpt.com)
