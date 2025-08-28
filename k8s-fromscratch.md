@@ -59,6 +59,8 @@ curl -i -H "Host: hello.localtest.me" http://127.0.0.1/
 
 This proves Ingress host-based routing → Service → Pods. (Ingress concept). [Kubernetes](https://kubernetes.io/docs/concepts/services-networking/ingress/?utm_source=chatgpt.com)
 
+# Check Troubleshooting Guide - Pt 2.
+---
 # 5) Operate: scale, upgrade, rollback
 
 **Why now:** Helm release mgmt is core in prod.
