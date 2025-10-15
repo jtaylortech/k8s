@@ -1,0 +1,7 @@
+service: 
+  type: ClusterIP
+ingress:
+  enabled: true 
+  hostname: hello.localtest.me     # wildcard DNS -> 127.0.0.1 
+  ingressClassName: nginx              # targets ingress-nginx 
+  path: /
