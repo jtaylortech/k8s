@@ -13,7 +13,11 @@ A comprehensive, hands-on guide to mastering Kubernetes—from your first pod to
 ```
 k8s/
 ├── README.md                          # You are here
+├── QUICKSTART.md                      # Get started in 5 minutes
 ├── PREREQUISITES.md                   # Setup instructions
+├── CONTRIBUTING.md                    # How to contribute
+├── CHANGELOG.md                       # Version history
+├── LICENSE                            # MIT License
 ├── beginner/                          # Learning Track (0-6 months)
 │   ├── 01-fundamentals/              # Containers, Pods, Deployments
 │   ├── 02-networking/                # Services, Ingress, DNS
@@ -118,6 +122,8 @@ k8s/
 ---
 
 ## Quick Start
+
+**In a hurry?** → [5-Minute Quick Start Guide](QUICKSTART.md)
 
 ### 1. Prerequisites
 ```bash
@@ -226,13 +232,19 @@ This repository is built on these principles:
 
 ## Contributing
 
-Found an error? Have a suggestion? Open an issue or PR!
+Found an error? Have a suggestion? Want to add content? We welcome contributions!
 
-Guidelines:
-- Keep examples simple and focused
-- Test all commands before submitting
-- Follow the existing structure
-- Add validation steps for exercises
+📝 **[Read Contributing Guide](CONTRIBUTING.md)** for:
+- How to report issues
+- Content guidelines
+- Pull request process
+- Style guide
+
+Quick contributions:
+- Fix typos or unclear explanations
+- Add exercises or examples
+- Update for new Kubernetes versions
+- Improve troubleshooting guides
 
 ---
 
@@ -250,7 +262,11 @@ Guidelines:
 
 ## License
 
-MIT License - feel free to use this for learning, teaching, or training.
+MIT License - free to use for learning, teaching, or training. See [LICENSE](LICENSE) for details.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 ---
 
