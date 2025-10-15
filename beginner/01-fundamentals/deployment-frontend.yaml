@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    tier: frontend
+    app: webstore
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      tier: frontend
+      app: webstore
+  template:
+    metadata:
+      labels:
+        tier: frontend
+        app: webstore
+        version: v1.0.0
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.25
