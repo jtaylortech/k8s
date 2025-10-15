@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: app
+data:
+  database: appdb
+  host: database
+  port: "5432"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: app
+type: Opaque
+stringData:
+  username: app
+  password: changeme-in-production
