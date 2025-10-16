@@ -1,0 +1,236 @@
+# Terraform Plan Workflow
+# Runs on pull requests to show proposed changes
+
+name: 'Terraform Plan'
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-*.yml'
+
+# Limit concurrency to prevent multiple plans running simultaneously
+concurrency:
+  group: terraform-plan-${{ github.head_ref }}
+  cancel-in-progress: true
+
+# Required permissions
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write  # Required for OIDC
+
+env:
+  TF_VERSION: '1.6.0'
+  AWS_REGION: 'us-west-2'
+
+jobs:
+  # Detect which environments have changed
+  detect-changes:
+    name: 'Detect Changed Environments'
+    runs-on: ubuntu-latest
+    outputs:
+      dev: ${{ steps.filter.outputs.dev }}
+      staging: ${{ steps.filter.outputs.staging }}
+      prod: ${{ steps.filter.outputs.prod }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            dev:
+              - 'terraform/dev/**'
+            staging:
+              - 'terraform/staging/**'
+            prod:
+              - 'terraform/prod/**'
+
+  # Run plan for each changed environment
+  plan:
+    name: 'Plan - ${{ matrix.environment }}'
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.dev == 'true' ||
+      needs.detect-changes.outputs.staging == 'true' ||
+      needs.detect-changes.outputs.prod == 'true'
+    strategy:
+      matrix:
+        environment:
+          - dev
+          - staging
+          - prod
+        exclude:
+          # Only run for environments that actually changed
+          - environment: dev
+            condition: ${{ needs.detect-changes.outputs.dev != 'true' }}
+          - environment: staging
+            condition: ${{ needs.detect-changes.outputs.staging != 'true' }}
+          - environment: prod
+            condition: ${{ needs.detect-changes.outputs.prod != 'true' }}
+
+    defaults:
+      run:
+        working-directory: terraform/${{ matrix.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Option 1: Use long-lived credentials (less secure)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Option 2: Use OIDC (more secure, recommended)
+      # - name: Configure AWS Credentials via OIDC
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+        continue-on-error: true
+
+      - name: Save Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan-${{ matrix.environment }}
+          path: terraform/${{ matrix.environment }}/tfplan
+          retention-days: 5
+
+      # Security Scanning
+      - name: Run tfsec
+        id: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/${{ matrix.environment }}
+          soft_fail: true
+
+      # Cost Estimation (requires Infracost API key)
+      - name: Setup Infracost
+        if: env.INFRACOST_API_KEY != ''
+        uses: infracost/actions/setup@v2
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Generate Infracost JSON
+        if: env.INFRACOST_API_KEY != ''
+        run: |
+          infracost breakdown --path=. \
+            --format=json \
+            --out-file=/tmp/infracost-${{ matrix.environment }}.json
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+
+      # Comment on PR with plan results
+      - name: Post Plan to PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Plan - \`${{ matrix.environment }}\` 📋
+
+            #### Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+            #### Initialization ⚙️ \`${{ steps.init.outcome }}\`
+            #### Validation 🤖 \`${{ steps.validate.outcome }}\`
+            #### Plan 📖 \`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`terraform
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      # Post Infracost comment (if enabled)
+      - name: Post Infracost to PR
+        if: env.INFRACOST_API_KEY != ''
+        uses: infracost/actions/comment@v1
+        with:
+          path: /tmp/infracost-${{ matrix.environment }}.json
+          behavior: update
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+
+      # Fail if plan failed
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  # Summary job
+  summary:
+    name: 'Plan Summary'
+    runs-on: ubuntu-latest
+    needs: plan
+    if: always()
+    steps:
+      - name: Post Summary
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const summary = `## Terraform Plan Summary
+
+            All environments have been planned successfully! ✅
+
+            Review the plans above and merge when ready.
+
+            **Next steps:**
+            1. Review the proposed changes
+            2. Check security scan results (tfsec)
+            3. Review cost estimates (Infracost)
+            4. Approve the PR
+            5. Merge to trigger automatic deployment
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            })

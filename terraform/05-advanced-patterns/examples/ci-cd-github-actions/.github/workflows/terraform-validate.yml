@@ -1,0 +1,112 @@
+# Terraform Validation Workflow
+# Runs on every push to ensure code quality
+
+name: 'Terraform Validate'
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-*.yml'
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: '1.6.0'
+
+jobs:
+  validate:
+    name: 'Validate and Lint'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      # Format check
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive -diff
+        continue-on-error: true
+
+      # Validate each environment
+      - name: Validate Dev
+        run: |
+          cd terraform/dev
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Staging
+        run: |
+          cd terraform/staging
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Prod
+        run: |
+          cd terraform/prod
+          terraform init -backend=false
+          terraform validate
+
+      # Security scanning with tfsec
+      - name: Run tfsec (Dev)
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/dev
+          soft_fail: true
+          format: sarif
+          output: tfsec-dev.sarif
+
+      - name: Run tfsec (Staging)
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/staging
+          soft_fail: true
+
+      - name: Run tfsec (Prod)
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/prod
+          soft_fail: false  # Fail on prod issues
+
+      # Upload SARIF for GitHub Security tab
+      - name: Upload SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: tfsec-dev.sarif
+
+      # Checkov security scanning
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform/
+          framework: terraform
+          soft_fail: true
+          output_format: cli
+
+      # Terraform docs check (if using terraform-docs)
+      # - name: Check documentation
+      #   uses: terraform-docs/gh-actions@v1
+      #   with:
+      #     working-dir: terraform/
+      #     output-file: README.md
+      #     output-method: inject
+      #     git-push: false
+      #     fail-on-diff: true
+
+      - name: Format Status
+        if: steps.fmt.outcome == 'failure'
+        run: |
+          echo "::error::Terraform files are not formatted correctly"
+          echo "Run: terraform fmt -recursive"
+          exit 1

@@ -1,0 +1,33 @@
+# Terraform files
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfvars
+!**/*.tfvars.example
+**/crash.log
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+**/*.tfplan
+**/state-backup-*.json
+
+# kubectl config
+**/kubeconfig_*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# GitHub Actions local testing
+act/
+
+# Infracost
+.infracost/
