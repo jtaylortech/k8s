@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(chmod:*)",
+      "Bash(git log:*)",
+      "Bash(while read hash msg)",
+      "Bash(do if git log --format=%B -n 1 \"$hash\")",
+      "Bash(then echo \"$hash: HAS CLAUDE MENTION\" fi done)",
+      "Bash(git filter-branch:*)",
+      "Bash(for i in {0..10})",
+      "Bash(do echo \"=== HEAD~$i ===\" git log --format=%B -n 1 HEAD~$i)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --msg-filter '\n  sed \"\"/🤖 Generated with/d\"\" |\n  sed \"\"/Co-Authored-By: Claude/d\"\"\n' HEAD~4..HEAD)",
+      "Bash(git for-each-ref:*)",
+      "Bash(xargs:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

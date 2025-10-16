@@ -37,6 +37,16 @@ k8s/
 │   ├── 03-managing-k8s-resources/    # K8s provider, Helm provider
 │   ├── 04-multi-environment/         # Workspaces, modules, DRY
 │   └── 05-advanced-patterns/         # CI/CD, GitOps, Policy as Code
+├── eks/                               # AWS EKS Deep Dive Track
+│   ├── 01-fundamentals/              # EKS architecture, first cluster
+│   ├── 02-networking/                # VPC, CNI, security groups
+│   ├── 03-iam-security/              # IRSA, Pod Identity, secrets
+│   ├── 04-compute/                   # Node groups, Fargate, Karpenter
+│   ├── 05-addons/                    # Controllers, CSI drivers
+│   ├── 06-observability/             # CloudWatch, Prometheus, ADOT
+│   ├── 07-advanced/                  # Multi-cluster, GitOps, DR
+│   ├── 08-iac/                       # Terraform & AWS CDK examples
+│   └── cheatsheets/                  # EKS quick references
 ├── examples/                          # Practical application manifests
 ├── cheatsheets/                       # Quick reference guides
 └── troubleshooting/                   # Common issues and solutions
@@ -170,7 +180,73 @@ k8s/
 **By the end**: You can provision production EKS clusters and manage infrastructure as code.
 
 **Note**: AWS EKS is primary focus. GKE/AKS patterns referenced where applicable.
-**Coming soon**: Dedicated EKS learning path with AWS CDK!
+
+---
+
+### ☁️ AWS EKS Deep Dive
+
+**Duration**: ~30-40 hours total | **Prerequisites**: Beginner track + Terraform basics
+**Goal**: Master Amazon EKS from fundamentals to production-grade deployments
+
+1. **[01-EKS Fundamentals](eks/01-fundamentals/README.md)**
+   - EKS architecture and components
+   - Control plane vs data plane
+   - Creating your first cluster
+   - Cost optimization strategies
+   - ⏱️ ~4 hours
+
+2. **[02-Networking Deep Dive](eks/02-networking/)** (Coming Soon)
+   - VPC design for EKS
+   - Amazon VPC CNI plugin
+   - Security groups and NACLs
+   - IP address management
+   - ⏱️ ~6 hours
+
+3. **[03-IAM and Security](eks/03-iam-security/)** (Coming Soon)
+   - IAM roles for service accounts (IRSA)
+   - Pod Identity
+   - RBAC integration
+   - Secrets management
+   - ⏱️ ~5 hours
+
+4. **[04-Managed Node Groups and Compute](eks/04-compute/)** (Coming Soon)
+   - Managed node groups
+   - Fargate profiles
+   - Spot instances
+   - Karpenter autoscaler
+   - ⏱️ ~5 hours
+
+5. **[05-Add-ons and Controllers](eks/05-addons/)** (Coming Soon)
+   - AWS Load Balancer Controller
+   - EBS/EFS CSI drivers
+   - External DNS
+   - Cert Manager
+   - ⏱️ ~6 hours
+
+6. **[06-Observability and Monitoring](eks/06-observability/)** (Coming Soon)
+   - CloudWatch Container Insights
+   - Control plane logging
+   - Prometheus and Grafana
+   - AWS Distro for OpenTelemetry
+   - ⏱️ ~5 hours
+
+7. **[07-Advanced Patterns](eks/07-advanced/)** (Coming Soon)
+   - Multi-cluster management
+   - GitOps with ArgoCD/Flux
+   - Service mesh integration
+   - Disaster recovery
+   - ⏱️ ~5 hours
+
+8. **[08-Infrastructure as Code](eks/08-iac/README.md)**
+   - Terraform for EKS
+   - **AWS CDK for EKS** (TypeScript/Python)
+   - eksctl vs IaC tools
+   - CI/CD integration
+   - ⏱️ ~4 hours
+
+**By the end**: You'll be an AWS EKS expert, ready to design and operate production clusters.
+
+**Tools covered**: eksctl, Terraform, AWS CDK, kubectl, Helm
 
 ---
 

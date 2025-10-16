@@ -1,0 +1,18 @@
+# Example terraform.tfvars file
+# Copy this to terraform.tfvars and customize
+
+container_name = "my-nginx"
+external_port  = 8080
+nginx_version  = "1.25"
+
+# Alternative configurations:
+
+# Development
+# container_name = "dev-nginx"
+# external_port  = 8080
+# nginx_version  = "latest"
+
+# Production
+# container_name = "prod-nginx"
+# external_port  = 80
+# nginx_version  = "1.25-alpine"

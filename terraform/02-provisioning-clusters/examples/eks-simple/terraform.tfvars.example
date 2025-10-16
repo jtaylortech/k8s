@@ -1,0 +1,44 @@
+# Example terraform.tfvars
+# Copy to terraform.tfvars and customize for your environment
+
+# AWS Configuration
+aws_region   = "us-west-2"
+project_name = "k8s-learning"
+environment  = "dev"
+owner        = "your-name"
+
+# Cluster Configuration
+cluster_name    = "dev-eks-cluster"
+cluster_version = "1.28"
+
+# VPC Configuration
+vpc_cidr  = "10.0.0.0/16"
+azs_count = 2  # 2 for dev, 3 for production
+
+# Node Group Configuration
+node_desired_size   = 2
+node_min_size       = 1
+node_max_size       = 5
+node_instance_types = ["t3.medium"]
+node_capacity_type  = "ON_DEMAND"  # Use "SPOT" for cost savings in dev
+
+# Features
+enable_cluster_autoscaler = true
+
+# -------------------
+# Alternative Configurations
+# -------------------
+
+# Development (minimal cost)
+# node_desired_size   = 1
+# node_instance_types = ["t3.small"]
+# node_capacity_type  = "SPOT"
+# azs_count           = 2
+
+# Production (high availability)
+# node_desired_size   = 3
+# node_min_size       = 2
+# node_max_size       = 10
+# node_instance_types = ["t3.large", "t3a.large"]
+# node_capacity_type  = "ON_DEMAND"
+# azs_count           = 3
