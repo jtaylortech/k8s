@@ -1,0 +1,36 @@
+# Production Environment Configuration
+# Copy to terraform.tfvars and customize
+
+aws_region   = "us-west-2"
+cluster_name = "prod-eks-cluster"  # Dedicated production cluster
+
+# Application
+app_name         = "myapp"
+image_repository = "myregistry/myapp"
+image_tag        = "1.0.0"          # NEVER use "latest" in production!
+container_port   = 8080
+
+# Health checks
+health_check_path = "/health"
+
+# Team
+team = "platform"
+
+# Monitoring (optional, but recommended)
+# sentry_dsn            = "https://xxxxx@sentry.io/xxxxx"
+# newrelic_license_key  = "xxxxx"
+
+# Note: Production environment uses:
+# - 3-20 replicas (with autoscaling)
+# - LoadBalancer service (~$18/month cost)
+# - Large resources (500m CPU, 512Mi memory)
+# - Warn level logging
+# - PodDisruptionBudget for high availability
+# - Production-grade monitoring and alerting
+#
+# IMPORTANT:
+# - Use AWS Secrets Manager for sensitive data
+# - Use specific image versions, never "latest"
+# - Enable all monitoring and alerting
+# - Review and approve all changes
+# - Test in staging first

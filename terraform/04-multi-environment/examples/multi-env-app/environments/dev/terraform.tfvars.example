@@ -1,0 +1,23 @@
+# Development Environment Configuration
+# Copy to terraform.tfvars and customize
+
+aws_region   = "us-west-2"
+cluster_name = "dev-eks-cluster"  # Your EKS cluster name
+
+# Application
+app_name         = "myapp"
+image_repository = "nginx"          # Or your image: "myregistry/myapp"
+image_tag        = "alpine"         # Or "latest" or specific version
+container_port   = 80               # Or your app port: 8080
+
+# Health checks
+health_check_path = "/"             # Or "/health" if your app has health endpoint
+
+# Team
+team = "platform"
+
+# Note: Dev environment uses:
+# - 1 replica (no autoscaling)
+# - ClusterIP service (no LoadBalancer cost)
+# - Minimal resources (50m CPU, 64Mi memory)
+# - Debug logging enabled

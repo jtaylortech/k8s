@@ -1,0 +1,24 @@
+# Staging Environment Configuration
+# Copy to terraform.tfvars and customize
+
+aws_region   = "us-west-2"
+cluster_name = "staging-eks-cluster"  # Your EKS cluster name (could be same as dev)
+
+# Application
+app_name         = "myapp"
+image_repository = "myregistry/myapp"  # Use your registry
+image_tag        = "1.0.0"             # Use specific version, not latest
+container_port   = 8080
+
+# Health checks
+health_check_path = "/health"
+
+# Team
+team = "platform"
+
+# Note: Staging environment uses:
+# - 2-5 replicas (with autoscaling)
+# - LoadBalancer service (~$18/month cost)
+# - Medium resources (100m CPU, 128Mi memory)
+# - Info level logging
+# - Realistic production-like setup for testing
