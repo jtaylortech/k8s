@@ -1,0 +1,66 @@
+# Basic EKS Cluster Configuration
+# Create with: eksctl create cluster -f basic-cluster.yaml
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: basic-cluster
+  region: us-west-2
+  version: "1.28"
+  tags:
+    environment: dev
+    managed-by: eksctl
+
+# VPC Configuration
+vpc:
+  cidr: 10.0.0.0/16
+  nat:
+    gateway: Single  # Use HighlyAvailable for production
+
+# IAM Configuration
+iam:
+  withOIDC: true  # Enable OIDC provider for IRSA
+
+# Managed Node Group
+managedNodeGroups:
+  - name: standard-workers
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 4
+    volumeSize: 20
+    volumeType: gp3
+
+    # SSH access (optional)
+    ssh:
+      allow: false
+
+    # Labels
+    labels:
+      role: worker
+      environment: dev
+
+    # Tags
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/basic-cluster: "owned"
+
+    # IAM policies
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true
+
+# CloudWatch Logging
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - api
+      - audit
+      - authenticator
+      - controllerManager
+      - scheduler
