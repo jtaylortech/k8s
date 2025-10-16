@@ -1,0 +1,107 @@
+# Example terraform.tfvars
+# Copy to terraform.tfvars and customize for your environment
+
+# =============================================================================
+# AWS and Cluster Configuration
+# =============================================================================
+
+aws_region   = "us-west-2"
+cluster_name = "dev-eks-cluster"  # Must match your existing EKS cluster name
+
+# =============================================================================
+# Application Configuration
+# =============================================================================
+
+app_name    = "demo-app"
+namespace   = "demo"
+environment = "dev"
+
+# Docker image to deploy
+app_image = "nginx:1.25-alpine"  # Or use your own image
+
+# Number of replicas (ignored if autoscaling is enabled)
+app_replicas = 2
+
+# Application port
+app_port = 80
+
+# =============================================================================
+# Resource Configuration
+# =============================================================================
+
+# CPU and memory requests (guaranteed resources)
+cpu_request    = "100m"   # 0.1 CPU cores
+memory_request = "128Mi"  # 128 megabytes
+
+# CPU and memory limits (maximum allowed)
+cpu_limit    = "500m"   # 0.5 CPU cores
+memory_limit = "256Mi"  # 256 megabytes
+
+# =============================================================================
+# Service Configuration
+# =============================================================================
+
+# Service type:
+# - ClusterIP: Internal only (accessible within cluster)
+# - LoadBalancer: Creates AWS Load Balancer (costs ~$18/month)
+# - NodePort: Exposes on node IP:port
+service_type = "LoadBalancer"
+
+# =============================================================================
+# Autoscaling Configuration
+# =============================================================================
+
+enable_autoscaling = true
+hpa_min_replicas   = 2
+hpa_max_replicas   = 10
+hpa_cpu_threshold  = 80  # Scale up when CPU > 80%
+
+# =============================================================================
+# Helm Configuration
+# =============================================================================
+
+# Install NGINX Ingress Controller
+# Costs: ~$18/month for NLB + $0.006/LCU-hour
+install_ingress_nginx = true
+ingress_nginx_version = "4.8.3"
+
+# =============================================================================
+# Labels
+# =============================================================================
+
+common_labels = {
+  managed-by = "terraform"
+  team       = "platform"
+  cost-center = "engineering"
+}
+
+# -------------------
+# Alternative Configurations
+# -------------------
+
+# Development (minimal cost, single replica, no LB)
+# app_replicas         = 1
+# service_type         = "ClusterIP"
+# enable_autoscaling   = false
+# install_ingress_nginx = false
+# cpu_request          = "50m"
+# memory_request       = "64Mi"
+
+# Staging (moderate cost, autoscaling enabled)
+# app_replicas         = 2
+# service_type         = "LoadBalancer"
+# enable_autoscaling   = true
+# hpa_min_replicas     = 2
+# hpa_max_replicas     = 5
+# install_ingress_nginx = true
+
+# Production (high availability, higher limits)
+# app_replicas         = 3
+# service_type         = "LoadBalancer"
+# enable_autoscaling   = true
+# hpa_min_replicas     = 3
+# hpa_max_replicas     = 20
+# hpa_cpu_threshold    = 70
+# cpu_limit            = "1000m"
+# memory_limit         = "512Mi"
+# install_ingress_nginx = true
