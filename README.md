@@ -31,6 +31,12 @@ k8s/
 │   ├── 04-scheduling-performance/    # Advanced Scheduling, Tuning
 │   ├── 05-production-operations/     # GitOps, Multi-cluster, DR
 │   └── 06-observability-advanced/    # Distributed Tracing, APM
+├── terraform/                         # Infrastructure as Code Track
+│   ├── 01-terraform-fundamentals/    # IaC basics, HCL, state
+│   ├── 02-provisioning-clusters/     # EKS, GKE, AKS with Terraform
+│   ├── 03-managing-k8s-resources/    # K8s provider, Helm provider
+│   ├── 04-multi-environment/         # Workspaces, modules, DRY
+│   └── 05-advanced-patterns/         # CI/CD, GitOps, Policy as Code
 ├── examples/                          # Practical application manifests
 ├── cheatsheets/                       # Quick reference guides
 └── troubleshooting/                   # Common issues and solutions
@@ -118,6 +124,53 @@ k8s/
    - Capacity planning
 
 **By the end**: You can architect, secure, and operate Kubernetes at scale in production.
+
+---
+
+### 🏗️ Terraform Track (Infrastructure as Code)
+
+**Duration**: ~15 hours total | **Prerequisites**: Beginner track complete
+**Goal**: Provision and manage Kubernetes infrastructure with Terraform
+
+1. **[01-Terraform Fundamentals](terraform/01-terraform-fundamentals/README.md)**
+   - Infrastructure as Code concepts
+   - HCL syntax and Terraform workflow
+   - State management
+   - Variables, outputs, data sources
+   - ⏱️ ~3 hours
+
+2. **[02-Provisioning Clusters](terraform/02-provisioning-clusters/README.md)** (EKS Focus)
+   - AWS EKS cluster provisioning
+   - VPC networking setup
+   - IAM roles and policies
+   - Node groups and autoscaling
+   - ⏱️ ~4 hours
+
+3. **[03-Managing K8s Resources](terraform/03-managing-k8s-resources/README.md)**
+   - Kubernetes provider
+   - Helm provider integration
+   - Deploying applications
+   - When to use Terraform vs kubectl
+   - ⏱️ ~3 hours
+
+4. **[04-Multi-Environment Patterns](terraform/04-multi-environment/README.md)**
+   - Reusable modules
+   - Workspaces and environments
+   - Remote state and locking
+   - Team collaboration
+   - ⏱️ ~3 hours
+
+5. **[05-Advanced Patterns](terraform/05-advanced-patterns/README.md)**
+   - CI/CD integration
+   - Policy as Code (OPA)
+   - Cost estimation
+   - Disaster recovery
+   - ⏱️ ~2 hours
+
+**By the end**: You can provision production EKS clusters and manage infrastructure as code.
+
+**Note**: AWS EKS is primary focus. GKE/AKS patterns referenced where applicable.
+**Coming soon**: Dedicated EKS learning path with AWS CDK!
 
 ---
 
